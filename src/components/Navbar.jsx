@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { MenuIcon } from "lucide-react";
 import { useAuth } from "../hooks/useAuth.js";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,8 +10,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SheetTrigger } from "@/components/ui/sheet";
 
-export function Navbar() {
+/** @param {{ showDashboardMobileNav?: boolean }} [props] */
+export function Navbar({ showDashboardMobileNav = false }) {
   const { session, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -33,6 +36,19 @@ export function Navbar() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 sm:h-16 sm:gap-4 sm:px-6 lg:px-8">
         <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
+          {showDashboardMobileNav ? (
+            <SheetTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                className="shrink-0 lg:hidden"
+                aria-label="Open navigation menu"
+              >
+                <MenuIcon className="size-5" />
+              </Button>
+            </SheetTrigger>
+          ) : null}
           <span className="hidden truncate text-sm text-muted-foreground lg:inline">
             Dashboard
           </span>
@@ -48,7 +64,7 @@ export function Navbar() {
               {initials}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64">
+          <DropdownMenuContent align="end" className="w-64 p-2">
             <DropdownMenuLabel className="font-normal">
               <div className="grid gap-0.5">
                 <p className="truncate text-sm font-medium text-foreground">
