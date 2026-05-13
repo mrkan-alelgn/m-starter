@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { signInWithGoogle, fetchWorkspaces, AuthApiError } from '../api/index.js'
 import { useAuth } from '../hooks/useAuth.js'
 import { GoogleSignInButton } from '../components/GoogleSignInButton.jsx'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function LandingPage() {
   const { session, signIn } = useAuth()
@@ -40,17 +41,20 @@ export function LandingPage() {
   }
 
   return (
-    <div className="flex min-h-dvh w-full items-center justify-center bg-zinc-50 px-4 py-12">
-      <div className="w-full max-w-md rounded-3xl border border-zinc-200/80 bg-white/90 p-8 shadow-[0_8px_40px_rgba(0,0,0,0.06)] backdrop-blur-sm sm:p-10">
-        <p className="text-center text-sm font-medium text-zinc-500">Sign in</p>
-        <div className="mt-8 flex flex-col items-stretch">
+    <div className="flex min-h-dvh w-full items-center justify-center bg-muted/40 px-4 py-12">
+      <Card className="w-full max-w-md border shadow-lg backdrop-blur-sm sm:p-2">
+        <CardHeader className="text-center">
+          <CardTitle>Sign in</CardTitle>
+          <CardDescription>Continue with your Google account</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col items-stretch pt-2">
           <GoogleSignInButton
             loading={status === 'loading'}
             onClick={handleGoogleSignIn}
             error={error}
           />
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
