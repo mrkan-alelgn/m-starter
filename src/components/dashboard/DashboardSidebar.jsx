@@ -26,6 +26,11 @@ function DashboardSidebarPanel({ sheet = false, className }) {
       Team & invites
     </NavLink>
   )
+  const samplesTable = (
+    <NavLink to="/dashboard/samples/table" className={navLinkClass}>
+      TanStack table
+    </NavLink>
+  )
 
   return (
     <div className={cn('flex min-h-0 flex-1 flex-col overflow-hidden', className)}>
@@ -54,6 +59,17 @@ function DashboardSidebarPanel({ sheet = false, className }) {
       >
         {overview}
         {team}
+        <div className={cn('pt-3', sheet ? 'mt-1' : 'mt-2')}>
+          <p
+            className={cn(
+              'mb-1.5 font-semibold uppercase tracking-wide text-muted-foreground',
+              sheet ? 'px-0 text-[0.6875rem] leading-none' : 'px-0 text-xs',
+            )}
+          >
+            Samples
+          </p>
+          <div className="flex flex-col gap-1">{samplesTable}</div>
+        </div>
       </nav>
     </div>
   )

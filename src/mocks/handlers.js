@@ -1,6 +1,13 @@
 import { http, HttpResponse } from 'msw'
-import { getApiBaseUrl, getGoogleAuthUrl, getWorkspacesUrl } from '../api/config.js'
+import {
+  getApiBaseUrl,
+  getGoogleAuthUrl,
+  getSamplesUsersUrl,
+  getWorkspacesUrl,
+} from '../api/config.js'
+import { parseSamplesUsersSearchParams } from '../lib/samplesUsersParams.js'
 import { MOCK_WORKSPACES } from './workspaces.fixtures.js'
+import { querySamplesUsers } from './samplesUsersStore.js'
 import {
   addInvite,
   getWorkspaceTeam,
@@ -105,6 +112,15 @@ export const handlers = [
       return HttpResponse.json({ message: result.message }, { status: result.status })
     }
     return HttpResponse.json({ member: result.member })
+  }),
+
+  http.get(getSamplesUsersUrl(), ({ request }) => {
+    if (!requireBearer(request)) {
+      return HttpResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    }
+    const url = new URL(request.url)
+    const query = parseSamplesUsersSearchParams(url.searchParams)
+    return HttpResponse.json(querySamplesUsers(query))
   }),
 
   http.patch(`${api}/workspaces/:workspaceId/invites/:inviteId`, async ({ request, params }) => {

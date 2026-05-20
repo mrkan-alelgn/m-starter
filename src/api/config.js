@@ -18,6 +18,9 @@ export const GOOGLE_AUTH_PATH = '/auth/google'
 /** GET list of workspaces for the authenticated user. */
 export const WORKSPACES_PATH = '/workspaces'
 
+/** GET paginated sample users for TanStack table demos (query params). */
+export const SAMPLES_USERS_PATH = '/samples/users'
+
 /** Full URL or path used by `fetch` and MSW handlers. */
 export function getGoogleAuthUrl() {
   return joinApiUrl(GOOGLE_AUTH_PATH)
@@ -45,4 +48,8 @@ export function getWorkspaceMembersUrl(workspaceId) {
 /** @param {string} workspaceId */
 export function getWorkspaceInvitesUrl(workspaceId) {
   return joinApiUrl(`/workspaces/${encodeURIComponent(workspaceId)}/invites`)
+}
+
+export function getSamplesUsersUrl() {
+  return joinApiUrl(SAMPLES_USERS_PATH)
 }
