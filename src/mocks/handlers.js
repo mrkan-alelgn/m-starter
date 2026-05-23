@@ -1,10 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import {
-  getApiBaseUrl,
-  getGoogleAuthUrl,
-  getSamplesUsersUrl,
-  getWorkspacesUrl,
-} from '../api/config.js'
+import { API_ROUTES, apiUrl } from '../api/config.js'
 import { parseSamplesUsersSearchParams } from '../lib/samplesUsersParams.js'
 import { MOCK_WORKSPACES } from './workspaces.fixtures.js'
 import { querySamplesUsers } from './samplesUsersStore.js'
@@ -23,14 +18,12 @@ function requireBearer(request) {
   return auth.slice('Bearer '.length)
 }
 
-const api = getApiBaseUrl()
-
 /**
  * Mock handlers mirror `src/api` routes. When the backend is live, remove MSW
  * startup in `main.jsx` — the same API calls will hit your server.
  */
 export const handlers = [
-  http.post(getGoogleAuthUrl(), async ({ request }) => {
+  http.post(apiUrl(API_ROUTES.googleAuth), async ({ request }) => {
     await request.json().catch(() => ({}))
 
     return HttpResponse.json({
@@ -44,14 +37,14 @@ export const handlers = [
     })
   }),
 
-  http.get(getWorkspacesUrl(), ({ request }) => {
+  http.get(apiUrl(API_ROUTES.workspaces), ({ request }) => {
     if (!requireBearer(request)) {
       return HttpResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
     return HttpResponse.json({ workspaces: MOCK_WORKSPACES })
   }),
 
-  http.get(`${api}/workspaces/:workspaceId/members`, ({ request, params }) => {
+  http.get(apiUrl('/workspaces/:workspaceId/members'), ({ request, params }) => {
     if (!requireBearer(request)) {
       return HttpResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
@@ -63,7 +56,7 @@ export const handlers = [
     return HttpResponse.json({ members: team.members })
   }),
 
-  http.get(`${api}/workspaces/:workspaceId/invites`, ({ request, params }) => {
+  http.get(apiUrl('/workspaces/:workspaceId/invites'), ({ request, params }) => {
     if (!requireBearer(request)) {
       return HttpResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
@@ -75,7 +68,7 @@ export const handlers = [
     return HttpResponse.json({ invites: team.invites })
   }),
 
-  http.post(`${api}/workspaces/:workspaceId/invites`, async ({ request, params }) => {
+  http.post(apiUrl('/workspaces/:workspaceId/invites'), async ({ request, params }) => {
     if (!requireBearer(request)) {
       return HttpResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
@@ -93,7 +86,7 @@ export const handlers = [
     return HttpResponse.json({ invite: result.invite })
   }),
 
-  http.patch(`${api}/workspaces/:workspaceId/members/:memberId`, async ({ request, params }) => {
+  http.patch(apiUrl('/workspaces/:workspaceId/members/:memberId'), async ({ request, params }) => {
     if (!requireBearer(request)) {
       return HttpResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
@@ -114,7 +107,7 @@ export const handlers = [
     return HttpResponse.json({ member: result.member })
   }),
 
-  http.get(getSamplesUsersUrl(), ({ request }) => {
+  http.get(apiUrl(API_ROUTES.samplesUsers), ({ request }) => {
     if (!requireBearer(request)) {
       return HttpResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
@@ -123,7 +116,7 @@ export const handlers = [
     return HttpResponse.json(querySamplesUsers(query))
   }),
 
-  http.patch(`${api}/workspaces/:workspaceId/invites/:inviteId`, async ({ request, params }) => {
+  http.patch(apiUrl('/workspaces/:workspaceId/invites/:inviteId'), async ({ request, params }) => {
     if (!requireBearer(request)) {
       return HttpResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }

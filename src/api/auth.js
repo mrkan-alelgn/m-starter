@@ -1,4 +1,5 @@
-import { getGoogleAuthUrl } from './config.js'
+import { API_ROUTES } from './config.js'
+import { apiRequest } from './client.js'
 
 /**
  * @typedef {Object} AuthUser
@@ -19,15 +20,6 @@ import { getGoogleAuthUrl } from './config.js'
  * @property {Workspace[]} [workspaces]
  */
 
-export class AuthApiError extends Error {
-  /** @param {number} status */
-  constructor(status, message = 'Request failed') {
-    super(message)
-    this.name = 'AuthApiError'
-    this.status = status
-  }
-}
-
 /**
  * Completes Google sign-in on the server. With the real API, pass `idToken` from
  * Google Identity Services / OAuth redirect flow.
@@ -36,27 +28,8 @@ export class AuthApiError extends Error {
  * @returns {Promise<GoogleSignInResult>}
  */
 export async function signInWithGoogle(body = {}) {
-  const res = await fetch(getGoogleAuthUrl(), {
+  return apiRequest(API_ROUTES.googleAuth, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify(body),
+    body,
   })
-
-  const data = await parseJsonSafe(res)
-
-  if (!res.ok) {
-    const message =
-      typeof data?.message === 'string' ? data.message : res.statusText || 'Sign-in failed'
-    throw new AuthApiError(res.status, message)
-  }
-
-  return /** @type {GoogleSignInResult} */ (data)
-}
-
-async function parseJsonSafe(res) {
-  try {
-    return await res.json()
-  } catch {
-    return null
-  }
 }

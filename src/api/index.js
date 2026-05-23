@@ -1,15 +1,10 @@
 export {
+  API_ROUTES,
+  apiUrl,
   getApiBaseUrl,
-  getGoogleAuthUrl,
-  getWorkspacesUrl,
-  getWorkspaceMembersUrl,
-  getWorkspaceInvitesUrl,
-  getSamplesUsersUrl,
-  GOOGLE_AUTH_PATH,
-  WORKSPACES_PATH,
-  SAMPLES_USERS_PATH,
 } from './config.js'
-export { signInWithGoogle, AuthApiError } from './auth.js'
+export { apiRequest, AuthApiError } from './client.js'
+export { signInWithGoogle } from './auth.js'
 export { fetchWorkspaces } from './workspaces.js'
 export {
   WORKSPACE_ROLES,

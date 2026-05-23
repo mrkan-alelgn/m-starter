@@ -1,5 +1,5 @@
-import { getWorkspaceInvitesUrl, getWorkspaceMembersUrl } from './config.js'
-import { AuthApiError } from './auth.js'
+import { API_ROUTES } from './config.js'
+import { apiRequest } from './client.js'
 
 /** @typedef {'admin' | 'member' | 'viewer'} WorkspaceRole */
 
@@ -22,33 +22,13 @@ export const WORKSPACE_ROLES = /** @type {const} */ (['admin', 'member', 'viewer
  * @property {string} createdAt
  */
 
-/** @param {string} accessToken */
-function authHeaders(accessToken) {
-  return {
-    Accept: 'application/json',
-    Authorization: `Bearer ${accessToken}`,
-  }
-}
-
-/** @param {string} accessToken */
-function jsonAuthHeaders(accessToken) {
-  return { ...authHeaders(accessToken), 'Content-Type': 'application/json' }
-}
-
 /**
  * @param {string} workspaceId
  * @param {string} accessToken
  * @returns {Promise<{ members: WorkspaceMember[] }>}
  */
 export async function fetchWorkspaceMembers(workspaceId, accessToken) {
-  const res = await fetch(getWorkspaceMembersUrl(workspaceId), {
-    headers: authHeaders(accessToken),
-  })
-  const data = await parseJsonSafe(res)
-  if (!res.ok) {
-    throw new AuthApiError(res.status, typeof data?.message === 'string' ? data.message : res.statusText)
-  }
-  return /** @type {{ members: WorkspaceMember[] }} */ (data)
+  return apiRequest(API_ROUTES.workspaceMembers(workspaceId), { accessToken })
 }
 
 /**
@@ -57,14 +37,7 @@ export async function fetchWorkspaceMembers(workspaceId, accessToken) {
  * @returns {Promise<{ invites: WorkspaceInvite[] }>}
  */
 export async function fetchWorkspaceInvites(workspaceId, accessToken) {
-  const res = await fetch(getWorkspaceInvitesUrl(workspaceId), {
-    headers: authHeaders(accessToken),
-  })
-  const data = await parseJsonSafe(res)
-  if (!res.ok) {
-    throw new AuthApiError(res.status, typeof data?.message === 'string' ? data.message : res.statusText)
-  }
-  return /** @type {{ invites: WorkspaceInvite[] }} */ (data)
+  return apiRequest(API_ROUTES.workspaceInvites(workspaceId), { accessToken })
 }
 
 /**
@@ -73,16 +46,11 @@ export async function fetchWorkspaceInvites(workspaceId, accessToken) {
  * @param {{ email: string; role: WorkspaceRole }} body
  */
 export async function createWorkspaceInvite(workspaceId, accessToken, body) {
-  const res = await fetch(getWorkspaceInvitesUrl(workspaceId), {
+  return apiRequest(API_ROUTES.workspaceInvites(workspaceId), {
     method: 'POST',
-    headers: jsonAuthHeaders(accessToken),
-    body: JSON.stringify(body),
+    accessToken,
+    body,
   })
-  const data = await parseJsonSafe(res)
-  if (!res.ok) {
-    throw new AuthApiError(res.status, typeof data?.message === 'string' ? data.message : res.statusText)
-  }
-  return /** @type {{ invite: WorkspaceInvite }} */ (data)
 }
 
 /**
@@ -92,17 +60,11 @@ export async function createWorkspaceInvite(workspaceId, accessToken, body) {
  * @param {{ role: WorkspaceRole }} body
  */
 export async function updateWorkspaceMemberRole(workspaceId, memberId, accessToken, body) {
-  const url = `${getWorkspaceMembersUrl(workspaceId)}/${encodeURIComponent(memberId)}`
-  const res = await fetch(url, {
+  return apiRequest(API_ROUTES.workspaceMember(workspaceId, memberId), {
     method: 'PATCH',
-    headers: jsonAuthHeaders(accessToken),
-    body: JSON.stringify(body),
+    accessToken,
+    body,
   })
-  const data = await parseJsonSafe(res)
-  if (!res.ok) {
-    throw new AuthApiError(res.status, typeof data?.message === 'string' ? data.message : res.statusText)
-  }
-  return /** @type {{ member: WorkspaceMember }} */ (data)
 }
 
 /**
@@ -112,23 +74,9 @@ export async function updateWorkspaceMemberRole(workspaceId, memberId, accessTok
  * @param {{ role: WorkspaceRole }} body
  */
 export async function updateWorkspaceInviteRole(workspaceId, inviteId, accessToken, body) {
-  const url = `${getWorkspaceInvitesUrl(workspaceId)}/${encodeURIComponent(inviteId)}`
-  const res = await fetch(url, {
+  return apiRequest(API_ROUTES.workspaceInvite(workspaceId, inviteId), {
     method: 'PATCH',
-    headers: jsonAuthHeaders(accessToken),
-    body: JSON.stringify(body),
+    accessToken,
+    body,
   })
-  const data = await parseJsonSafe(res)
-  if (!res.ok) {
-    throw new AuthApiError(res.status, typeof data?.message === 'string' ? data.message : res.statusText)
-  }
-  return /** @type {{ invite: WorkspaceInvite }} */ (data)
-}
-
-async function parseJsonSafe(res) {
-  try {
-    return await res.json()
-  } catch {
-    return null
-  }
 }

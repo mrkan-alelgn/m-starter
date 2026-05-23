@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { AuthApiError } from '../api/auth.js'
+import { AuthApiError } from '../api/client.js'
 import { fetchWorkspaceInvites, fetchWorkspaceMembers } from '../api/workspaceTeam.js'
 
 /**

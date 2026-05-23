@@ -1,5 +1,5 @@
-import { getSamplesUsersUrl } from './config.js'
-import { AuthApiError } from './auth.js'
+import { API_ROUTES } from './config.js'
+import { apiRequest } from './client.js'
 import {
   parseSamplesUsersSearchParams,
   samplesUsersQueryToSearchParams,
@@ -22,14 +22,6 @@ import {
  * @property {'asc' | 'desc'} order
  */
 
-/** @param {string} accessToken */
-function authHeaders(accessToken) {
-  return {
-    Accept: 'application/json',
-    Authorization: `Bearer ${accessToken}`,
-  }
-}
-
 /**
  * @param {string} accessToken
  * @param {SamplesUsersQuery | URLSearchParams} query
@@ -40,16 +32,7 @@ export async function fetchSamplesUsers(accessToken, query) {
     query instanceof URLSearchParams
       ? query
       : samplesUsersQueryToSearchParams(query)
-  const url = `${getSamplesUsersUrl()}?${params.toString()}`
-  const res = await fetch(url, { headers: authHeaders(accessToken) })
-  const data = await parseJsonSafe(res)
-  if (!res.ok) {
-    throw new AuthApiError(
-      res.status,
-      typeof data?.message === 'string' ? data.message : res.statusText,
-    )
-  }
-  return /** @type {SamplesUsersResponse} */ (data)
+  return apiRequest(API_ROUTES.samplesUsers, { accessToken, searchParams: params })
 }
 
 /**
@@ -59,12 +42,4 @@ export async function fetchSamplesUsers(accessToken, query) {
 export function fetchSamplesUsersFromSearchParams(accessToken, searchParams) {
   const query = parseSamplesUsersSearchParams(searchParams)
   return fetchSamplesUsers(accessToken, query)
-}
-
-async function parseJsonSafe(res) {
-  try {
-    return await res.json()
-  } catch {
-    return null
-  }
 }
